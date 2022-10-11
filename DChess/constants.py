@@ -17,7 +17,7 @@ beige = (245,245,220)
 brown_chocolate = (210,105,30)
 brown = (55,55,55)
 cornsilk = (255,248,220)
-Green = (0,255,0)
+Grey = (201,201,201)
 
 path_image = "DChess\images"
 

@@ -20,7 +20,7 @@ class Game:
         pygame.display.update()
 
     def reset(self):
-        self.Board = newBoard(Width, Height, Rows, Cols, Square, Win)
+        self.Board = newBoard(Width, Height, Rows, Cols, Square, self.Win)
         self.Square = Square
         self.selected = None
 
@@ -42,17 +42,15 @@ class Game:
                 return True
 
 
-    def enemies_moves(self,piece, Board):
+    def enemies_moves(self, piece, Board):
         enemies_moves = []
         for r in range(len(Board)):
             for c in range(len(Board[r])):
                 if Board[r][c] != 0:
                     if Board[r][c].color != piece.color:
                         moves = Board[r][c].get_available_moves(r,c,Board)
-                        #print(self.Board.Board[r][c].type, moves)
                         for move in moves:
                             enemies_moves.append(move)
-        #print("enemies_moves",enemies_moves)
         return enemies_moves
 
     def get_King_pos(self,Board):
@@ -64,8 +62,6 @@ class Game:
 
     def simulate_move(self, piece,row,col):
         piece_row, piece_col = piece.row, piece.col
-        print("piece row, col",piece_row, piece_col)
-        print(row,col)
         save_piece = self.Board.Board[row][col]
         if self.Board.Board[row][col] != 0:
             self.Board.Board[row][col] = 0
@@ -91,7 +87,6 @@ class Game:
                 if Board[r][c] != 0:
                     if Board[r][c].color == self.turn and Board[r][c].type != "King":
                         moves = Board[r][c].get_available_moves(r,c,Board)
-                        #print(self.Board.Board[r][c].type, moves)
                         for move in moves:
                             possible_moves.append(move)
 
@@ -105,11 +100,14 @@ class Game:
         king_available_moves = set(get_king.get_available_moves(king_pos[0], king_pos[1], Board.Board))
         enemies_moves_set = set(self.enemies_moves(get_king,Board.Board))
         king_moves = king_available_moves - enemies_moves_set
+        possible_move = False
+        for move in king_moves:
+            if self.simulate_move(get_king, move[0], move[1]):
+                possible_move = True
         set1 = king_available_moves.intersection(enemies_moves_set)
         possible_moves_to_def = set1.intersection(self.possible_moves(Board.Board))
-        if len(king_moves) == 0 and len(king_available_moves) != 0 and possible_moves_to_def == 0:
+        if (len(king_moves) == 0 or not possible_move) and len(king_available_moves) != 0 and len(possible_moves_to_def) == 0 :
             return True
-
         return False
 
 
@@ -124,12 +122,11 @@ class Game:
     def select(self,row,col):
 
         if self.selected:
-            #print("selected")
 
             move = self._move(row,col)
 
             if not move:
-                #print("in not move")
+
                 self.selected = None
                 self.select(row,col)
 
@@ -137,23 +134,19 @@ class Game:
         if piece != 0 and self.turn == piece.color:
             self.selected = piece
 
-            #print(piece)
             self.valid_moves = piece.get_available_moves(row,col,self.Board.Board)
-            print("self valid_moves", self.valid_moves)
-            print("new valid_moves", self.valid_moves)
 
     def _move(self,row,col):
+
         piece = self.Board.get_piece(row,col)
-        print("self selected", self.selected.type)
+
         if self.selected and (row,col) in self.valid_moves:
             if piece == 0 or piece.color != self.selected.color:
-                print(self.simulate_move(self.selected,row,col))
                 if self.simulate_move(self.selected,row,col):
 
                     self.remove(self.Board.Board,piece,row,col)
                     self.Board.move(self.selected,row,col)
                     self.change_turn()
-                    print("turn", self.turn)
                     self.valid_moves = []
                     self.selected = None
 
@@ -171,15 +164,13 @@ class Game:
                 self.White_pieces_left -= 1
             else:
                 self.Black_pieces_left -= 1
-        print("White_pieces_left : ", self.White_pieces_left)
-        print("Black_pieces_left : ", self.Black_pieces_left)
 
 
     def draw_available_moves(self):
         if len(self.valid_moves) > 0:
             for pos in self.valid_moves:
-                row,col = pos[0],pos[1]
-                pygame.draw.circle(self.Win, Green, (col*self.Square + self.Square//2, row*self.Square + self.Square//2),self.Square//8)
+                row, col = pos[0],pos[1]
+                pygame.draw.circle(self.Win, Grey, (col*self.Square + self.Square//2, row*self.Square + self.Square//2),self.Square//8)
 
     def get_board(self):
         return self.board
