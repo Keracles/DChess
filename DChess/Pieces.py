@@ -96,9 +96,11 @@ class Pawn(Piece):
 class Rook(Piece):
     def __init__(self, Square, image,color,type,row,col):
         super().__init__(Square, image,color,type,row,col)
+        self.first_move = True
 
     def get_available_moves(self,row,col,Board):
         self.clear_available_moves()
+
         for i in range(row+1, 8):
 
             if Board[i][col] == 0:
@@ -407,12 +409,29 @@ class King(Piece):
     
     def __init__(self,Square, image,color,type,row,col):
         super().__init__(Square, image,color,type,row,col)
+        self.first_move = True
 
 
     def get_available_moves(self,row,col,Board):
+
         self.clear_available_moves()
+        if self.first_move:
+            for i in range(col+1,len(Board)-1):
+                if Board[row][i] == 0:
+                    if Board[row][7] != 0:
+                        if Board[row][7].type == "Rook":
+                            if Board[row][7].first_move == True:
+                                self.available_moves.append((row, 6))
+    
+            for i in range(col-1, 0, -1):
+                if Board[row][i] == 0:
+                    if Board[row][0] != 0:
+                        if Board[row][0].type == "Rook":
+                            if Board[row][0].first_move == True:
+                                self.available_moves.append((row, 2))
 
         if row-1 >= 0:
+
             if Board[row-1][col] == 0 or Board[row-1][col].color != self.color:
                 self.available_moves.append((row-1,col))
 
