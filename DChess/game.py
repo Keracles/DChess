@@ -142,20 +142,56 @@ class Game:
 
         if self.selected and (row,col) in self.valid_moves:
             if piece == 0 or piece.color != self.selected.color:
-                if self.simulate_move(self.selected,row,col):
+                if self.selected.type == "King":
+                    if self.simulate_rock(row,col):
 
-                    self.remove(self.Board.Board,piece,row,col)
-                    self.Board.move(self.selected,row,col)
-                    self.change_turn()
-                    self.valid_moves = []
-                    self.selected = None
+                        self.Board.move(self.selected,row,col)
 
+                        if col == 2:
+                            self.Board.move(self.Board.Board[row][0],row,col+1)
+                        else :
+                            self.Board.move(self.Board.Board[row][7],row,col-1)
+                        self.change_turn()
+                        self.valid_moves = []
+                        self.selected = None
+                        return True
 
-                    return True
-                return False
+                    else :
+                        if self.simulate_move(self.selected,row,col):
+                            self.remove(self.Board.Board,piece,row,col)
+                            self.Board.move(self.selected,row,col)
+                            self.change_turn()
+                            self.valid_moves = []
+                            self.selected = None
 
+                else :    
+
+                    if self.simulate_move(self.selected,row,col):
+
+                        self.remove(self.Board.Board,piece,row,col)
+                        self.Board.move(self.selected,row,col)
+                        self.change_turn()
+                        self.valid_moves = []
+                        self.selected = None
+
+                        return True
+
+                    return False
+
+            return False
+    
+    def simulate_rock(self,piece, row, col):
+        if (row,col) == (0, 2) or (row, col) == (7, 2):
+            for c in range(1, 4):
+                if (row,c) in self.enemies_moves(piece, self.Board.Board):
+                    return False
+                return True
+        if (row, col) == (0, 6) or (row, col) == (7, 6):
+            for c in range(5, 7):
+                if (row,c) in self.enemies_moves(piece, self.Board.Board):
+                    return False
+                return True
         return False
-
 
     def remove(self,board,piece,row,col):
         if piece != 0:

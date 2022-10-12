@@ -66,7 +66,7 @@ class newBoard:
         self.Board[piece.row][piece.col], self.Board[row][col] = self.Board[row][col], self.Board[piece.row][piece.col]
         piece.piece_move(row,col)
 
-        if piece.type == "Pawn":
+        if piece.type == "Pawn" or piece.type == "King" or piece.type == "Rook":
             if piece.first_move:
                 piece.first_move = False
 
