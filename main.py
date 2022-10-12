@@ -48,7 +48,4 @@ def main():
                     row,col = get_positions(location[0],location[1])
                     game.select(row,col)
 
-
-
-
 main()
